@@ -1,0 +1,1210 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Autovate Automations| Enterprise Automation Infrastructure</title>
+    <meta name="description" content="We build silent, invisible AI infrastructure to scale your operations.">
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/3658/3658756.png" type="image/png">
+
+    <!-- MICROSOFT CLARITY -->
+    <script type="text/javascript">
+        (function (c, l, a, r, i, t, y) {
+            c[a] = c[a] || function () { (c[a].q = c[a].q || []).push(arguments) };
+            t = l.createElement(r); t.async = 1; t.src = "https://www.clarity.ms/tag/" + i;
+            y = l.getElementsByTagName(r)[0]; y.parentNode.insertBefore(t, y);
+        })(window, document, "clarity", "script", "YOUR_CLARITY_ID_HERE");
+    </script>
+
+    <!-- LIBRARIES -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+
+    <!-- CONFIG -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        background: '#050505',
+                        surface: '#0a0a0a',
+                        card: '#111111',
+                        border: '#27272a',
+                        primary: '#ffffff',
+                        muted: '#a1a1aa',
+                        brand: '#3b82f6',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'marquee': 'marquee 25s linear infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        float: { '0%, 100%': { transform: 'translateY(0)' }, '50%': { transform: 'translateY(-10px)' } },
+                        marquee: { '0%': { transform: 'translateX(0)' }, '100%': { transform: 'translateX(-50%)' } }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400&display=swap');
+
+        body {
+            background-color: #050505;
+            color: #ffffff;
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .noise-overlay {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 40;
+            opacity: 0.03;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+        }
+
+        #preloader {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            z-index: 100;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.5s ease;
+        }
+
+        .loader-bar {
+            width: 200px;
+            height: 2px;
+            background: #222;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .loader-progress {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: #fff;
+            transition: width 2s cubic-bezier(0.19, 1, 0.22, 1);
+        }
+
+        .spotlight-card {
+            background: rgba(17, 17, 17, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            transition: all 0.4s ease;
+        }
+
+        .spotlight-card:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .chat-bubble-user {
+            background: #3b82f6;
+            color: white;
+            border-radius: 18px 18px 0 18px;
+            box-shadow: 0 2px 10px rgba(59, 130, 246, 0.2);
+        }
+
+        .chat-bubble-ai {
+            background: #1a1a1a;
+            color: #e5e5e5;
+            border-radius: 18px 18px 18px 0;
+            border: 1px solid #333;
+        }
+
+        .glass-nav {
+            background: rgba(5, 5, 5, 0.7);
+            backdrop-filter: blur(16px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .cursor-blink {
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0;
+            }
+        }
+
+        .roadmap-step .step-desc,
+        .faq-item .faq-answer {
+            transition: all 0.3s ease-out;
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+        }
+
+        .roadmap-step.active .step-desc,
+        .faq-item.active .faq-answer {
+            max-height: 200px;
+            opacity: 1;
+            margin-top: 10px;
+            padding-top: 10px;
+        }
+
+        .roadmap-step .chevron,
+        .faq-item .chevron {
+            transition: transform 0.3s;
+        }
+
+        .roadmap-step.active .chevron,
+        .faq-item.active .chevron {
+            transform: rotate(180deg);
+        }
+
+        .roadmap-step.active .step-icon {
+            background-color: #3b82f6;
+            border-color: #3b82f6;
+        }
+
+        .faq-item.active {
+            border-color: rgba(59, 130, 246, 0.5);
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+
+        .force-dark-text {
+            color: #000000 !important;
+        }
+
+        /* Toast Notification */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 100;
+        }
+
+        .toast {
+            background: #1a1a1a;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            border: 1px solid #333;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+            margin-top: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .toast.show {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Industry Hover Effects */
+        .industry-card:hover h3 {
+            transition: color 0.3s ease;
+        }
+
+        .industry-card:hover i {
+            transition: transform 0.3s ease;
+            transform: scale(1.1);
+        }
+
+        .industry-card.legal:hover h3 {
+            color: #3b82f6;
+        }
+
+        .industry-card.finance:hover h3 {
+            color: #22c55e;
+        }
+
+        .industry-card.education:hover h3 {
+            color: #eab308;
+        }
+
+        .industry-card.travel:hover h3 {
+            color: #06b6d4;
+        }
+
+        .industry-card.logistics:hover h3 {
+            color: #f97316;
+        }
+
+        .industry-card.marketing:hover h3 {
+            color: #ec4899;
+        }
+
+        .industry-card.fitness:hover h3 {
+            color: #10b981;
+        }
+
+        .industry-card.saas:hover h3 {
+            color: #6366f1;
+        }
+
+        /* Scroll Animations Class */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+    </style>
+</head>
+
+<body class="antialiased selection:bg-brand selection:text-white">
+
+    <!-- PRELOADER -->
+    <div id="preloader">
+        <div class="flex flex-col items-center gap-4">
+            <div class="font-mono text-xs text-muted tracking-widest">INITIALIZING AUTOVATE OS...</div>
+            <div class="loader-bar">
+                <div class="loader-progress" id="loader-progress"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="noise-overlay"></div>
+    <canvas id="neural-canvas" class="fixed inset-0 z-0 opacity-40"></canvas>
+    <div id="toast-container"></div>
+
+    <!-- NAVBAR -->
+    <nav class="fixed w-full z-50 top-0 glass-nav transition-all duration-300" id="navbar">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-3 cursor-pointer group" onclick="scrollToTop()">
+                <div class="relative w-10 h-10 flex items-center justify-center">
+                    <div
+                        class="absolute inset-0 bg-gradient-to-tr from-blue-500 to-purple-500 rounded-xl blur opacity-20 group-hover:opacity-100 transition-opacity duration-500">
+                    </div>
+                    <div
+                        class="relative w-full h-full bg-white/5 border border-white/10 rounded-xl flex items-center justify-center backdrop-blur-sm group-hover:border-white/20 transition-colors">
+                        <i class="fas fa-cube text-lg text-white"></i>
+                    </div>
+                </div>
+                <span class="font-bold text-xl tracking-tight text-white">
+                    Autovate<span class="text-blue-500">.ai</span>
+                </span>
+            </div>
+
+            <div class="hidden md:flex items-center gap-4">
+                <div class="flex gap-1">
+                    <a href="#solutions"
+                        class="px-4 py-2 text-xs font-medium uppercase tracking-widest text-muted hover:text-cyan-400 transition-colors relative group">Solutions</a>
+                    <a href="#industries"
+                        class="px-4 py-2 text-xs font-medium uppercase tracking-widest text-muted hover:text-green-400 transition-colors relative group">Industries</a>
+                    <a href="#products"
+                        class="px-4 py-2 text-xs font-medium uppercase tracking-widest text-muted hover:text-purple-400 transition-colors relative group">Products</a>
+                    <a href="#ankita"
+                        class="px-4 py-2 text-xs font-medium uppercase tracking-widest text-muted hover:text-pink-400 transition-colors relative group flex items-center gap-2">Intelligence
+                        <span class="w-1.5 h-1.5 rounded-full bg-pink-500 animate-pulse"></span></a>
+                </div>
+
+                <!-- DYNAMIC AUTH BUTTONS -->
+                <div id="auth-buttons" class="flex items-center gap-3 border-l border-white/10 pl-4">
+                    <button onclick="showLoginModal()"
+                        class="text-xs font-bold text-muted hover:text-white transition-colors uppercase tracking-widest">Login</button>
+                </div>
+            </div>
+
+            <button onclick="scrollToAnkita()"
+                class="relative group overflow-hidden rounded-lg p-[1px] focus:outline-none ml-4">
+                <span
+                    class="absolute inset-0 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 opacity-70 group-hover:opacity-100 transition-opacity duration-300"></span>
+                <span
+                    class="relative flex items-center gap-2 bg-[#0a0a0a] px-6 py-2.5 rounded-lg transition-all duration-300 group-hover:bg-black">
+                    <span class="text-xs font-bold text-white tracking-wide">BOOK APPOINTMENT</span>
+                    <i class="fas fa-arrow-right text-[10px] text-white"></i>
+                </span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="min-h-screen flex flex-col justify-center items-center pt-24 px-6 relative z-10 overflow-hidden">
+        <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-brand/20 blur-[120px] rounded-full pointer-events-none animate-pulse-slow">
+        </div>
+        <div
+            class="fade-up mb-8 inline-flex items-center gap-3 px-4 py-1.5 rounded-full border border-white/10 bg-white/[0.05] backdrop-blur-md">
+            <span class="relative flex h-2 w-2"><span
+                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span
+                    class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span></span>
+            <span class="text-[10px] uppercase tracking-widest text-muted font-medium">System Operational v2.0</span>
+        </div>
+        <h1
+            class="fade-up text-5xl md:text-7xl lg:text-8xl font-medium tracking-tighter text-center mb-6 leading-[1.1] z-20">
+            Automate Your <br />
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-brand via-purple-400 to-brand"
+                id="typewriter-text"></span><span class="cursor-blink text-brand">|</span>
+        </h1>
+        <p class="fade-up text-lg text-muted max-w-2xl text-center mb-10 font-light leading-relaxed z-20">We build
+            silent, invisible AI infrastructure to scale your operations.</p>
+        <div class="fade-up flex flex-col sm:flex-row gap-4 items-center z-20">
+            <button onclick="scrollToAnkita()"
+                class="group relative px-8 py-4 bg-white text-black rounded-lg overflow-hidden transition-all hover:scale-105 hover:bg-gray-200 shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+                <span class="relative font-bold text-sm flex items-center gap-2">Start Automation <i
+                        class="fas fa-arrow-right text-xs"></i></span>
+            </button>
+            <a href="#solutions"
+                class="text-sm text-muted hover:text-white transition-colors px-6 py-4 flex items-center gap-2 border border-white/10 rounded-lg hover:bg-white/5"><i
+                    class="fas fa-play-circle"></i> View Architecture</a>
+        </div>
+    </section>
+
+    <!-- INFINITE MARQUEE -->
+    <div class="border-y border-white/5 bg-black/50 py-8 overflow-hidden relative z-20 fade-up">
+        <div class="flex animate-marquee whitespace-nowrap">
+            <div
+                class="flex items-center gap-16 mx-8 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+                <span class="text-xl font-bold flex items-center gap-2"><i class="fas fa-robot"></i> OpenAI</span>
+                <span class="text-xl font-bold flex items-center gap-2"><i class="fas fa-bolt"></i> Make</span>
+                <span class="text-xl font-bold flex items-center gap-2"><i class="fas fa-calendar"></i> Calendly</span>
+                <span class="text-xl font-bold flex items-center gap-2"><i class="fas fa-database"></i> AirTable</span>
+                <span class="text-xl font-bold flex items-center gap-2"><i class="fas fa-comment-dots"></i>
+                    Twilio</span>
+                <span class="text-xl font-bold flex items-center gap-2"><i class="fas fa-credit-card"></i> Stripe</span>
+            </div>
+            <div
+                class="flex items-center gap-16 mx-8 opacity-50 grayscale hover:grayscale-0 transition-all duration-500">
+                <span class="text-xl font-bold flex items-center gap-2"><i class="fas fa-robot"></i> OpenAI</span>
+                <span class="text-xl font-bold flex items-center gap-2"><i class="fas fa-bolt"></i> Make</span>
+                <span class="text-xl font-bold flex items-center gap-2"><i class="fas fa-calendar"></i> Calendly</span>
+                <span class="text-xl font-bold flex items-center gap-2"><i class="fas fa-database"></i> AirTable</span>
+                <span class="text-xl font-bold flex items-center gap-2"><i class="fas fa-comment-dots"></i>
+                    Twilio</span>
+                <span class="text-xl font-bold flex items-center gap-2"><i class="fas fa-credit-card"></i> Stripe</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- STATS -->
+    <section class="py-24 border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-6 grid grid-cols-1 md:grid-cols-3 gap-12 text-center">
+            <div class="space-y-2">
+                <div class="text-5xl font-bold text-white counter" data-target="10000">0</div>
+                <div class="text-sm text-muted uppercase tracking-widest">Hours Saved</div>
+            </div>
+            <div class="space-y-2">
+                <div class="text-5xl font-bold text-white counter" data-target="500">0</div>
+                <div class="text-sm text-muted uppercase tracking-widest">Workflows Built</div>
+            </div>
+            <div class="space-y-2">
+                <div class="text-5xl font-bold text-white counter" data-target="99">0</div>
+                <div class="text-sm text-muted uppercase tracking-widest">% Uptime Guarantee</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURED SOLUTIONS -->
+    <section id="solutions" class="py-32 px-6 fade-up">
+        <div class="max-w-7xl mx-auto">
+            <div class="mb-20">
+                <h2 class="text-3xl font-medium mb-4">Enterprise Capabilities</h2>
+                <div class="h-1 w-20 bg-brand rounded-full"></div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div
+                    class="spotlight-card rounded-2xl p-8 group border border-white/10 hover:border-cyan-500/50 transition-colors duration-300">
+                    <div
+                        class="w-12 h-12 bg-cyan-500/10 rounded-lg border border-cyan-500/20 flex items-center justify-center mb-6">
+                        <i class="fas fa-home text-xl text-cyan-500"></i>
+                    </div>
+                    <h3 class="text-xl font-medium mb-3 text-white">Real Estate</h3>
+                    <p class="text-muted text-sm leading-relaxed mb-6">Speed-to-lead automation. We call leads within 30
+                        seconds of submission.</p>
+                    <div
+                        class="text-xs font-mono text-cyan-400 border border-cyan-500/30 bg-cyan-500/10 inline-block px-2 py-1 rounded">
+                        +300% CONVERSION</div>
+                </div>
+                <div
+                    class="spotlight-card rounded-2xl p-8 group border border-white/10 hover:border-emerald-500/50 transition-colors duration-300">
+                    <div
+                        class="w-12 h-12 bg-emerald-500/10 rounded-lg border border-emerald-500/20 flex items-center justify-center mb-6">
+                        <i class="fas fa-heartbeat text-xl text-emerald-500"></i>
+                    </div>
+                    <h3 class="text-xl font-medium mb-3 text-white">Healthcare</h3>
+                    <p class="text-muted text-sm leading-relaxed mb-6">HIPAA-compliant patient intake and appointment
+                        reminders.</p>
+                    <div
+                        class="text-xs font-mono text-emerald-400 border border-emerald-500/30 bg-emerald-500/10 inline-block px-2 py-1 rounded">
+                        ZERO ADMIN TIME</div>
+                </div>
+                <div
+                    class="spotlight-card rounded-2xl p-8 group border border-white/10 hover:border-purple-500/50 transition-colors duration-300">
+                    <div
+                        class="w-12 h-12 bg-purple-500/10 rounded-lg border border-purple-500/20 flex items-center justify-center mb-6">
+                        <i class="fas fa-shopping-cart text-xl text-purple-500"></i>
+                    </div>
+                    <h3 class="text-xl font-medium mb-3 text-white">E-Commerce</h3>
+                    <p class="text-muted text-sm leading-relaxed mb-6">Abandoned cart recovery voice agents and 24/7
+                        support.</p>
+                    <div
+                        class="text-xs font-mono text-purple-400 border border-purple-500/30 bg-purple-500/10 inline-block px-2 py-1 rounded">
+                        24/7 REVENUE</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- INDUSTRIES GRID (Expanded & Color Hover) -->
+    <section id="industries" class="py-24 border-t border-white/5 bg-surface relative overflow-hidden fade-up">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="text-center mb-16">
+                <h2 class="text-3xl font-medium mb-4">Industries We Serve</h2>
+                <p class="text-muted">Click on a category to view specific automation use cases.</p>
+            </div>
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                <div onclick="showIndustryDetails('legal')"
+                    class="industry-card legal p-6 border border-white/5 rounded-xl bg-card hover:bg-white/5 transition-colors group cursor-pointer">
+                    <i class="fas fa-gavel text-2xl mb-3 text-blue-500"></i>
+                    <h3 class="text-sm font-medium text-white">Legal</h3>
+                </div>
+                <div onclick="showIndustryDetails('finance')"
+                    class="industry-card finance p-6 border border-white/5 rounded-xl bg-card hover:bg-white/5 transition-colors group cursor-pointer">
+                    <i class="fas fa-chart-line text-2xl mb-3 text-green-500"></i>
+                    <h3 class="text-sm font-medium text-white">Finance</h3>
+                </div>
+                <div onclick="showIndustryDetails('education')"
+                    class="industry-card education p-6 border border-white/5 rounded-xl bg-card hover:bg-white/5 transition-colors group cursor-pointer">
+                    <i class="fas fa-graduation-cap text-2xl mb-3 text-yellow-500"></i>
+                    <h3 class="text-sm font-medium text-white">Education</h3>
+                </div>
+                <div onclick="showIndustryDetails('travel')"
+                    class="industry-card travel p-6 border border-white/5 rounded-xl bg-card hover:bg-white/5 transition-colors group cursor-pointer">
+                    <i class="fas fa-plane text-2xl mb-3 text-cyan-500"></i>
+                    <h3 class="text-sm font-medium text-white">Travel</h3>
+                </div>
+                <div onclick="showIndustryDetails('logistics')"
+                    class="industry-card logistics p-6 border border-white/5 rounded-xl bg-card hover:bg-white/5 transition-colors group cursor-pointer">
+                    <i class="fas fa-truck text-2xl mb-3 text-orange-500"></i>
+                    <h3 class="text-sm font-medium text-white">Logistics</h3>
+                </div>
+                <div onclick="showIndustryDetails('marketing')"
+                    class="industry-card marketing p-6 border border-white/5 rounded-xl bg-card hover:bg-white/5 transition-colors group cursor-pointer">
+                    <i class="fas fa-bullhorn text-2xl mb-3 text-pink-500"></i>
+                    <h3 class="text-sm font-medium text-white">Marketing</h3>
+                </div>
+                <div onclick="showIndustryDetails('fitness')"
+                    class="industry-card fitness p-6 border border-white/5 rounded-xl bg-card hover:bg-white/5 transition-colors group cursor-pointer">
+                    <i class="fas fa-dumbbell text-2xl mb-3 text-emerald-500"></i>
+                    <h3 class="text-sm font-medium text-white">Fitness</h3>
+                </div>
+                <div onclick="showIndustryDetails('saas')"
+                    class="industry-card saas p-6 border border-white/5 rounded-xl bg-card hover:bg-white/5 transition-colors group cursor-pointer">
+                    <i class="fas fa-laptop-code text-2xl mb-3 text-indigo-500"></i>
+                    <h3 class="text-sm font-medium text-white">SaaS</h3>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- NEWLY LAUNCHED SECTION (RAG Agent) -->
+    <section id="new-launch" class="py-24 border-t border-white/5 bg-[#0a0a0a] fade-up">
+        <div class="max-w-7xl mx-auto px-6 relative z-10">
+            <div class="text-center mb-12">
+                <span
+                    class="inline-block py-1 px-3 rounded-full bg-brand/10 border border-brand/30 text-brand text-xs font-bold tracking-widest uppercase mb-4 animate-pulse">New
+                    Launch</span>
+                <h2 class="text-3xl md:text-4xl font-medium mb-4 text-white">Next-Gen AI Models</h2>
+            </div>
+            <div
+                class="group p-8 md:p-12 border border-brand/30 rounded-2xl bg-gradient-to-r from-black to-[#0a0a0a] hover:border-brand/60 transition-all duration-500 relative overflow-hidden shadow-2xl shadow-brand/10 text-left mt-8">
+                <div class="flex flex-col md:flex-row items-start md:items-center gap-8">
+                    <div
+                        class="w-20 h-20 rounded-2xl bg-brand flex items-center justify-center text-white shadow-[0_0_30px_rgba(59,130,246,0.5)] shrink-0">
+                        <i class="fas fa-network-wired text-4xl"></i>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-2xl md:text-3xl font-bold text-white mb-3">RAG Knowledge Agent</h3>
+                        <p class="text-gray-300 text-sm md:text-base leading-relaxed mb-6 max-w-2xl">
+                            <strong>Retrieval-Augmented Generation (RAG)</strong> allows AI to "read" your entire
+                            company knowledge base. We train agents on your PDFs, Notion docs, and Google Drive to
+                            answer queries instantly with 100% accuracy.
+                        </p>
+                        <button onclick="scrollToAnkita()"
+                            class="bg-white text-black font-bold py-3 px-8 rounded-lg hover:bg-gray-200 transition-all flex items-center gap-2">Ask
+                            Ankita to Deploy <i class="fas fa-rocket ml-2"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- READY TO DEPLOY PRODUCTS (UPDATED STYLE WITH ICONS) -->
+    <section id="products" class="py-24 border-t border-white/5 bg-[#050505] fade-up">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-6">
+                <div>
+                    <h2 class="text-3xl font-medium mb-2">Ready-to-Deploy Systems</h2>
+                    <p class="text-muted max-w-xl">Skip development time. Pre-built architectures.</p>
+                </div>
+                <button onclick="scrollToAnkita()"
+                    class="text-sm text-white border border-white/10 px-6 py-3 rounded hover:bg-white/5 transition-colors">Get
+                    Custom Build &rarr;</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Products -->
+                <div class="p-8 border border-white/10 rounded-2xl bg-black/40 hover:border-brand/50 transition-all">
+                    <div class="flex items-center gap-3 mb-4"><i class="fab fa-whatsapp text-green-400 text-2xl"></i>
+                        <h3 class="text-xl font-bold text-white">WhatsApp Bot</h3>
+                    </div><button onclick="showDeployModal('WhatsApp Business API')"
+                        class="text-xs font-bold text-green-400 border-b border-green-400 pb-1">DEPLOY NOW</button>
+                </div>
+                <div class="p-8 border border-white/10 rounded-2xl bg-black/40 hover:border-brand/50 transition-all">
+                    <div class="flex items-center gap-3 mb-4"><i class="fas fa-magnet text-blue-400 text-2xl"></i>
+                        <h3 class="text-xl font-bold text-white">B2B Scraper</h3>
+                    </div><button onclick="showDeployModal('B2B Lead Scraper')"
+                        class="text-xs font-bold text-blue-400 border-b border-blue-400 pb-1">DEPLOY NOW</button>
+                </div>
+                <div class="p-8 border border-white/10 rounded-2xl bg-black/40 hover:border-brand/50 transition-all">
+                    <div class="flex items-center gap-3 mb-4"><i
+                            class="fas fa-paper-plane text-purple-400 text-2xl"></i>
+                        <h3 class="text-xl font-bold text-white">Omni-Channel</h3>
+                    </div><button onclick="showDeployModal('Omni-Channel Blaster')"
+                        class="text-xs font-bold text-purple-400 border-b border-purple-400 pb-1">DEPLOY NOW</button>
+                </div>
+                <div class="p-8 border border-white/10 rounded-2xl bg-black/40 hover:border-brand/50 transition-all">
+                    <div class="flex items-center gap-3 mb-4"><i class="fas fa-microphone text-orange-400 text-2xl"></i>
+                        <h3 class="text-xl font-bold text-white">AI Voice Caller</h3>
+                    </div><button onclick="showDeployModal('AI Voice Caller')"
+                        class="text-xs font-bold text-orange-400 border-b border-orange-400 pb-1">DEPLOY NOW</button>
+                </div>
+                <div class="p-8 border border-white/10 rounded-2xl bg-black/40 hover:border-brand/50 transition-all">
+                    <div class="flex items-center gap-3 mb-4"><i class="fas fa-share-alt text-pink-400 text-2xl"></i>
+                        <h3 class="text-xl font-bold text-white">Social Pilot</h3>
+                    </div><button onclick="showDeployModal('Social Auto-Pilot')"
+                        class="text-xs font-bold text-pink-400 border-b border-pink-400 pb-1">DEPLOY NOW</button>
+                </div>
+                <div class="p-8 border border-white/10 rounded-2xl bg-black/40 hover:border-brand/50 transition-all">
+                    <div class="flex items-center gap-3 mb-4"><i class="fas fa-database text-cyan-400 text-2xl"></i>
+                        <h3 class="text-xl font-bold text-white">CRM Enricher</h3>
+                    </div><button onclick="showDeployModal('CRM Data Enricher')"
+                        class="text-xs font-bold text-cyan-400 border-b border-cyan-400 pb-1">DEPLOY NOW</button>
+                </div>
+                <div class="p-8 border border-white/10 rounded-2xl bg-black/40 hover:border-brand/50 transition-all">
+                    <div class="flex items-center gap-3 mb-4"><i class="fas fa-star text-yellow-400 text-2xl"></i>
+                        <h3 class="text-xl font-bold text-white">Review Guardian</h3>
+                    </div><button onclick="showDeployModal('AI Review Guardian')"
+                        class="text-xs font-bold text-yellow-400 border-b border-yellow-400 pb-1">DEPLOY NOW</button>
+                </div>
+                <div class="p-8 border border-white/10 rounded-2xl bg-black/40 hover:border-brand/50 transition-all">
+                    <div class="flex items-center gap-3 mb-4"><i class="fas fa-user-check text-indigo-400 text-2xl"></i>
+                        <h3 class="text-xl font-bold text-white">HR Scout</h3>
+                    </div><button onclick="showDeployModal('HR Talent Scout')"
+                        class="text-xs font-bold text-indigo-400 border-b border-indigo-400 pb-1">DEPLOY NOW</button>
+                </div>
+                <div class="p-8 border border-white/10 rounded-2xl bg-black/40 hover:border-brand/50 transition-all">
+                    <div class="flex items-center gap-3 mb-4"><i class="fas fa-video text-red-400 text-2xl"></i>
+                        <h3 class="text-xl font-bold text-white">Meeting Intel</h3>
+                    </div><button onclick="showDeployModal('Meeting Intel Bot')"
+                        class="text-xs font-bold text-red-400 border-b border-red-400 pb-1">DEPLOY NOW</button>
+                </div>
+
+                <!-- Custom Build -->
+                <div
+                    class="p-8 border border-brand/50 rounded-2xl bg-gradient-to-b from-brand/10 to-black/40 hover:border-brand/80 transition-all flex flex-col justify-center items-center text-center lg:col-span-3">
+                    <h3 class="text-2xl font-bold mb-3 text-white">Custom Enterprise Build</h3>
+                    <p class="text-sm text-gray-300 mb-8 leading-relaxed max-w-lg">Need something unique? We architect
+                        bespoke AI infrastructure tailored to your exact SOPs.</p>
+                    <button onclick="scrollToAnkita()"
+                        class="w-full max-w-md bg-brand text-white font-bold py-4 rounded-xl hover:bg-blue-600 transition-all shadow-lg shadow-brand/20 flex items-center justify-center gap-2">BOOK
+                        APPOINTMENT FOR PERSONAL BUILD <i class="fas fa-arrow-right"></i></button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ANKITA CHAT -->
+    <section id="ankita" class="py-32 px-6 relative fade-up">
+        <div class="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div>
+                <h2 class="text-4xl font-medium mb-4">Meet Ankita.</h2>
+                <p class="text-muted leading-relaxed mb-8">Use Ankita AI to discuss your business problem, get a
+                    solution overview, and book an expert consultation.</p>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="p-4 border border-white/10 rounded bg-white/5">
+                        <div class="font-bold text-white text-sm">Diagnosis</div>
+                    </div>
+                    <div class="p-4 border border-white/10 rounded bg-white/5">
+                        <div class="font-bold text-white text-sm">Solutions</div>
+                    </div>
+                    <div class="p-4 border border-white/10 rounded bg-white/5">
+                        <div class="font-bold text-white text-sm">Pricing</div>
+                    </div>
+                    <div class="p-4 border border-white/10 rounded bg-white/5">
+                        <div class="font-bold text-white text-sm">Booking</div>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="bg-[#0a0a0a] border border-white/10 rounded-2xl shadow-2xl h-[500px] flex flex-col overflow-hidden relative">
+                <div class="p-6 border-b border-white/5 bg-white/[0.02] flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-brand flex items-center justify-center font-bold">A</div>
+                    <div>
+                        <div class="text-sm font-bold">Ankita AI</div>
+                        <div class="text-[10px] text-green-500">● ONLINE</div>
+                    </div>
+                </div>
+                <div id="chat-history" class="flex-1 overflow-y-auto p-6 space-y-6">
+                    <div class="flex gap-4">
+                        <div class="chat-bubble-ai p-4 text-sm max-w-[85%]">Hello! I'm Ankita, your AI Guiding
+                            Assistant. Let's start with your biggest challenge: Are you looking to automate
+                            <strong>Sales</strong>, <strong>Support</strong>, or <strong>Operations</strong> today?
+                        </div>
+                    </div>
+                </div>
+                <div id="typing-indicator" class="hidden px-6 pb-4 absolute bottom-20 left-0">
+                    <div
+                        class="bg-card px-3 py-1 rounded-full text-xs text-muted border border-white/10 flex items-center gap-2">
+                        <span class="w-2 h-2 bg-brand rounded-full animate-pulse"></span> Typing...
+                    </div>
+                </div>
+                <div class="p-4 border-t border-white/5 bg-black/50 mt-auto">
+                    <div class="relative">
+                        <input type="text" id="user-input"
+                            class="w-full bg-white/5 border border-white/10 rounded-xl pl-4 pr-12 py-4 text-sm text-white focus:outline-none focus:border-brand/50"
+                            placeholder="Type message..." onkeypress="handleKeyPress(event)">
+                        <button onclick="sendMessage()"
+                            class="absolute right-2 top-2 h-10 w-10 bg-brand rounded-lg flex items-center justify-center"><i
+                                class="fas fa-paper-plane text-xs"></i></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ROADMAP SECTION (RESTORED OLD STYLE WITH NEW TEXT) -->
+    <section id="roadmap" class="py-24 border-t border-white/5 bg-surface fade-up">
+        <div class="max-w-7xl mx-auto px-6 text-center">
+            <h2 class="text-3xl font-medium mb-12">Implementation Protocols</h2>
+            <div class="grid md:grid-cols-2 gap-12 text-left relative">
+                <div class="hidden md:block absolute top-0 bottom-0 left-1/2 w-px bg-white/10 -translate-x-1/2"></div>
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-6">Custom Build Protocol</h3>
+                    <div class="space-y-8 relative pl-8 border-l border-white/10 ml-6">
+                        <div class="relative group cursor-pointer roadmap-step" onclick="toggleRoadmap(this)">
+                            <span
+                                class="step-icon absolute -left-[39px] top-1 w-5 h-5 rounded-full bg-black border border-brand/50 group-hover:bg-brand transition-colors"></span>
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-white">01. Connect with Expert</h4><i
+                                    class="fas fa-chevron-down text-xs chevron"></i>
+                            </div>
+                            <p class="step-desc text-sm text-muted mt-2 hidden">Schedule a 15-min strategy call to
+                                define goals.</p>
+                        </div>
+                        <div class="relative group cursor-pointer roadmap-step" onclick="toggleRoadmap(this)">
+                            <span
+                                class="step-icon absolute -left-[39px] top-1 w-5 h-5 rounded-full bg-black border border-brand/50 group-hover:bg-brand transition-colors"></span>
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-white">02. Deep Dive Audit</h4><i
+                                    class="fas fa-chevron-down text-xs chevron"></i>
+                            </div>
+                            <p class="step-desc text-sm text-muted mt-2 hidden">We analyze your current SOPs, map out
+                                bottlenecks, and calculate projected ROI.</p>
+                        </div>
+                        <div class="relative group cursor-pointer roadmap-step" onclick="toggleRoadmap(this)">
+                            <span
+                                class="step-icon absolute -left-[39px] top-1 w-5 h-5 rounded-full bg-black border border-brand/50 group-hover:bg-brand transition-colors"></span>
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-white">03. Architecture Blueprint</h4><i
+                                    class="fas fa-chevron-down text-xs chevron"></i>
+                            </div>
+                            <p class="step-desc text-sm text-muted mt-2 hidden">Designing the multi-agent workflow and
+                                tech stack (LLMs, Vector DBs, APIs).</p>
+                        </div>
+                        <div class="relative group cursor-pointer roadmap-step" onclick="toggleRoadmap(this)">
+                            <span
+                                class="step-icon absolute -left-[39px] top-1 w-5 h-5 rounded-full bg-black border border-brand/50 group-hover:bg-brand transition-colors"></span>
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-white">04. Development Sprint</h4><i
+                                    class="fas fa-chevron-down text-xs chevron"></i>
+                            </div>
+                            <p class="step-desc text-sm text-muted mt-2 hidden">Building and testing agents in a sandbox
+                                environment to ensure 99.9% reliability.</p>
+                        </div>
+                        <div class="relative group cursor-pointer roadmap-step" onclick="toggleRoadmap(this)">
+                            <span
+                                class="step-icon absolute -left-[39px] top-1 w-5 h-5 rounded-full bg-black border border-brand/50 group-hover:bg-brand transition-colors"></span>
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-white">05. Live Deployment</h4><i
+                                    class="fas fa-chevron-down text-xs chevron"></i>
+                            </div>
+                            <p class="step-desc text-sm text-muted mt-2 hidden">Integration with live systems +
+                                comprehensive staff training on new workflows.</p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-xl font-bold text-white mb-6">Rapid Deployment</h3>
+                    <div class="space-y-8 relative pl-8 border-l border-white/10 ml-6">
+                        <div class="relative group cursor-pointer roadmap-step" onclick="toggleRoadmap(this)">
+                            <span
+                                class="step-icon absolute -left-[39px] top-1 w-5 h-5 rounded-full bg-black border border-green-500/50 group-hover:bg-green-500 transition-colors"></span>
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-white">01. Select System</h4><i
+                                    class="fas fa-chevron-down text-xs chevron"></i>
+                            </div>
+                            <p class="step-desc text-sm text-muted mt-2 hidden">Choose a pre-built module from our
+                                library.</p>
+                        </div>
+                        <div class="relative group cursor-pointer roadmap-step" onclick="toggleRoadmap(this)">
+                            <span
+                                class="step-icon absolute -left-[39px] top-1 w-5 h-5 rounded-full bg-black border border-green-500/50 group-hover:bg-green-500 transition-colors"></span>
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-white">02. API Configuration</h4><i
+                                    class="fas fa-chevron-down text-xs chevron"></i>
+                            </div>
+                            <p class="step-desc text-sm text-muted mt-2 hidden">We connect your accounts within 2 hours.
+                            </p>
+                        </div>
+                        <div class="relative group cursor-pointer roadmap-step" onclick="toggleRoadmap(this)">
+                            <span
+                                class="step-icon absolute -left-[39px] top-1 w-5 h-5 rounded-full bg-black border border-green-500/50 group-hover:bg-green-500 transition-colors"></span>
+                            <div class="flex justify-between items-center">
+                                <h4 class="font-bold text-white">03. Go Live</h4><i
+                                    class="fas fa-chevron-down text-xs chevron"></i>
+                            </div>
+                            <p class="step-desc text-sm text-muted mt-2 hidden">Instant activation with standard
+                                operating procedures.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- FAQ SECTION (UPDATED TIMELINES) -->
+    <section id="faq" class="py-32 px-6 border-t border-white/5 bg-surface fade-up">
+        <div class="max-w-3xl mx-auto text-center mb-16">
+            <h2 class="text-3xl font-medium">FAQ</h2>
+        </div>
+        <div class="max-w-3xl mx-auto space-y-4">
+            <div class="p-6 border border-white/10 rounded-xl bg-black/40 cursor-pointer faq-item"
+                onclick="toggleFaq(this)">
+                <div class="flex justify-between text-white font-bold">How long does a build take? <i
+                        class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer px-6 pb-6 text-muted text-sm border-t border-white/5 pt-4 hidden">
+                    <strong>Custom Automations:</strong> Approx 1 Month (Step-by-step security checks).<br>
+                    <strong>Ready-to-Deploy:</strong> 15 Days to arrive on your desktop.
+                </div>
+            </div>
+            <div class="p-6 border border-white/10 rounded-xl bg-black/40 cursor-pointer faq-item"
+                onclick="toggleFaq(this)">
+                <div class="flex justify-between text-white font-bold">Do I own the data? <i
+                        class="fas fa-chevron-down"></i></div>
+                <div class="faq-answer px-6 pb-6 text-muted text-sm border-t border-white/5 pt-4 hidden">Yes, data
+                    safety is our priority. You own all data and API keys.</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CONTACT SECTION -->
+    <section id="contact" class="py-24 border-t border-white/5 bg-surface relative text-center fade-up">
+        <h2 class="text-3xl font-bold text-white mb-4">Contact Direct</h2>
+        <div class="max-w-md mx-auto mt-8 space-y-4">
+            <a href="tel:7249634419"
+                class="block w-full bg-white text-black font-bold py-4 rounded-xl hover:bg-gray-200 force-dark-text">Call
+                Now: 7249634419</a>
+            <a href="https://wa.me/917249634419" target="_blank"
+                class="block w-full bg-[#25D366] text-white font-bold py-4 rounded-xl">WhatsApp</a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="border-t border-white/5 bg-[#020202] py-20 text-center">
+        <span class="font-bold text-xl">Autovate</span>
+        <div class="flex justify-center gap-6 mt-4 text-sm text-muted">
+            <a href="privacy.html" class="hover:text-white transition-colors">Privacy Policy</a>
+            <a href="terms.html" class="hover:text-white transition-colors">Terms of Service</a>
+        </div>
+        <p class="text-xs text-muted mt-4">© 2025 Autovate Automations. All rights reserved.</p>
+    </footer>
+
+    <!-- MODALS -->
+    <div id="industry-modal" class="fixed inset-0 z-[70] hidden">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closeIndustryModal()"></div>
+        <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-2xl p-8 shadow-2xl max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="modal-title" class="text-2xl font-bold text-white">Automation List</h2><button
+                    onclick="closeIndustryModal()" class="text-muted hover:text-white"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div id="modal-content" class="space-y-4"></div>
+            <button onclick="closeIndustryModal()"
+                class="mt-6 border border-white/10 text-white px-6 py-2 rounded-lg float-right">Close</button>
+        </div>
+    </div>
+
+    <!-- LOGIN MODAL -->
+    <div id="login-modal" class="fixed inset-0 z-[90] hidden">
+        <div class="absolute inset-0 bg-black/90 backdrop-blur-sm" onclick="closeLoginModal()"></div>
+        <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-sm bg-card border border-white/10 rounded-2xl p-8 shadow-2xl">
+            <div class="text-center mb-8">
+                <div class="flex items-center justify-center gap-2 mb-4">
+                    <div class="w-8 h-8 bg-brand rounded flex items-center justify-center text-white"><i
+                            class="fas fa-cube"></i></div>
+                    <h3 class="text-xl font-bold text-white">Autovate Automations</h3>
+                </div>
+                <p id="modal-heading" class="text-muted text-sm">Sign in to manage your custom AI workflows.</p>
+            </div>
+            <button onclick="loginWithGoogle()"
+                class="w-full bg-white text-black font-bold py-3 rounded-lg hover:bg-gray-200 mb-4 flex items-center justify-center gap-2"><img
+                    src="https://www.svgrepo.com/show/475656/google-color.svg" class="w-5 h-5" alt="Google Logo">
+                Continue with Google</button>
+            <button onclick="loginWithMicrosoft()"
+                class="w-full bg-[#2f2f2f] border border-white/10 text-white font-bold py-3 rounded-lg hover:bg-[#3f3f3f] mb-4 flex items-center justify-center gap-2"><img
+                    src="https://www.svgrepo.com/show/452062/microsoft.svg" class="w-5 h-5" alt="Microsoft Logo">
+                Continue with Microsoft</button>
+            <div class="text-center text-xs text-muted cursor-pointer" onclick="closeLoginModal()">Close</div>
+        </div>
+    </div>
+
+    <div id="deploy-modal" class="fixed inset-0 z-[80] hidden">
+        <div class="absolute inset-0 bg-black/95 backdrop-blur-md" onclick="closeDeployModal()"></div>
+        <div
+            class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-md bg-[#0a0a0a] border border-white/10 rounded-2xl p-8 shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="deploy-title" class="text-xl font-bold text-white">Deploy System</h2><button
+                    onclick="closeDeployModal()" class="text-muted hover:text-white"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <p class="text-muted text-sm mb-8">To deploy this system immediately, please contact our engineering team.
+            </p>
+            <div class="bg-white/5 rounded-xl p-6 text-center border border-white/10 mb-6">
+                <p class="text-xs text-muted uppercase tracking-widest mb-2">Direct Support Line</p>
+                <p class="text-2xl font-mono font-bold text-white">7249634419</p>
+            </div>
+            <div class="space-y-3">
+                <a href="tel:7249634419"
+                    class="block w-full bg-white text-black text-center font-bold py-3 rounded-lg hover:bg-gray-200 force-dark-text"><i
+                        class="fas fa-phone-alt mr-2"></i> Call Now</a>
+                <a href="https://wa.me/917249634419" target="_blank"
+                    class="block w-full bg-[#25D366] text-white text-center font-bold py-3 rounded-lg hover:bg-[#20BD5C]"><i
+                        class="fab fa-whatsapp mr-2"></i> WhatsApp Us</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST CONTAINER -->
+    <div id="toast-container"></div>
+
+    <!-- FIREBASE AUTHENTICATION MODULE -->
+    <script type="module">
+        // USING STABLE VERSION 10.8.0 TO PREVENT CRASHES
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js';
+        import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged, signInAnonymously } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js';
+        import { getFirestore, doc, setDoc, addDoc, collection, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyA3q52ylxsohHdSjt8DBpPqb0u_5OwuG74",
+            authDomain: "autovate-9539e.firebaseapp.com",
+            projectId: "autovate-9539e",
+            storageBucket: "autovate-9539e.firebasestorage.app",
+            messagingSenderId: "97606874980",
+            appId: "1:97606874980:web:b534ca6139600cb9eeec71",
+            measurementId: "G-F5JPZS0N2F"
+        };
+
+        let app, auth, db;
+        try {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+        } catch (error) { console.warn("Firebase Init Warning:", error); }
+
+        window.saveUserToFirestore = async (user) => {
+            if (!db) return;
+            try {
+                await setDoc(doc(db, "users", user.uid), { uid: user.uid, displayName: user.displayName, email: user.email, photoURL: user.photoURL, lastSeen: serverTimestamp() }, { merge: true });
+            } catch (e) { console.error("Error saving user:", e); }
+        };
+        window.recordBookingInterest = async () => { if (!db || !auth.currentUser) return; try { await addDoc(collection(db, "leads"), { userId: auth.currentUser.uid, type: "BOOKING_INTEREST", timestamp: serverTimestamp() }); } catch (e) { } };
+        window.recordDeployInterest = async (productName) => { if (!db || !auth.currentUser) return; try { await addDoc(collection(db, "leads"), { userId: auth.currentUser.uid, type: "DEPLOY_INTEREST", product: productName, timestamp: serverTimestamp() }); } catch (e) { } };
+
+        window.loginWithGoogle = async function () {
+            if (!auth) { window.showToast("Auth unavailable. Switching to Demo."); simulateLogin(); return; }
+            const provider = new GoogleAuthProvider();
+            try { await signInWithPopup(auth, provider); window.closeLoginModal(); window.showToast("Login Successful!"); }
+            catch (error) { console.log("Auth Error detected. Switching to Demo Mode."); simulateLogin(); }
+        }
+        function simulateLogin() {
+            const authContainer = document.getElementById('auth-buttons');
+            if (authContainer) authContainer.innerHTML = `<span class="text-xs font-medium text-white mr-2 hidden md:inline-block">Hi, Guest</span><button onclick="window.location.reload()" class="text-xs font-bold text-muted hover:text-red-400 transition-colors uppercase tracking-widest">Sign Out</button>`;
+            window.closeLoginModal();
+        }
+        window.loginWithMicrosoft = function () { alert("Microsoft Login is in beta."); }
+        window.handleEmailAuth = function (event) { event.preventDefault(); alert("Use Google for demo."); }
+        window.handleLogout = async function () { if (auth) await signOut(auth); else window.location.reload(); }
+
+        if (auth) {
+            onAuthStateChanged(auth, (user) => {
+                const authContainer = document.getElementById('auth-buttons');
+                if (!authContainer) return;
+                if (user) {
+                    window.saveUserToFirestore(user);
+                    const shortName = (user.displayName || "User").split(' ')[0];
+                    authContainer.innerHTML = `<span class="text-xs font-medium text-white mr-2 hidden md:inline-block">Hi, ${shortName}</span><button onclick="handleLogout()" class="text-xs font-bold text-muted hover:text-red-400 transition-colors uppercase tracking-widest">Sign Out</button>`;
+                } else {
+                    authContainer.innerHTML = `<button onclick="showLoginModal()" class="text-xs font-bold text-muted hover:text-white transition-colors uppercase tracking-widest">Login</button>`;
+                }
+            });
+        }
+    </script>
+
+    <!-- MAIN LOGIC SCRIPT -->
+    <script>
+        const API_KEY = "AIzaSyB3ln7KNd-kfxeFPIcqJzbwx4-nyM1k3c8";
+        const CALENDAR_LINK = "https://calendly.com/anishpatil146/30min";
+
+        window.addEventListener('load', () => {
+            const loader = document.getElementById('loader-progress');
+            const preloader = document.getElementById('preloader');
+            if (loader && preloader) {
+                loader.style.width = '100%';
+                setTimeout(() => {
+                    preloader.style.opacity = '0';
+                    setTimeout(() => {
+                        preloader.style.display = 'none';
+                        initAnimations();
+                        if (!localStorage.getItem('hasVisited')) {
+                            setTimeout(() => { if (window.showLoginModal) showLoginModal(); localStorage.setItem('hasVisited', 'true'); }, 2500);
+                        }
+                    }, 500);
+                }, 1000);
+            }
+        });
+
+        // GSAP Scroll Trigger
+        function initAnimations() {
+            if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+                gsap.registerPlugin(ScrollTrigger);
+
+                gsap.utils.toArray('.fade-up').forEach(el => {
+                    gsap.to(el, {
+                        opacity: 1,
+                        y: 0,
+                        duration: 1,
+                        scrollTrigger: { trigger: el, start: "top 85%" }
+                    });
+                });
+
+                const counters = document.querySelectorAll('.counter');
+                counters.forEach(counter => {
+                    const target = +counter.getAttribute('data-target');
+                    const tl = gsap.timeline({
+                        scrollTrigger: { trigger: counter, start: "top 90%", once: true }
+                    });
+                    let obj = { val: 0 };
+                    tl.to(obj, {
+                        val: target,
+                        duration: 2,
+                        ease: "power2.out",
+                        onUpdate: function () {
+                            counter.innerText = Math.ceil(obj.val) + (target > 100 ? "+" : "%");
+                        }
+                    });
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const typewriterText = document.getElementById('typewriter-text');
+            (function type(element) {
+                if (!element) return;
+                const phrases = ["Sales", "Support", "Operations", "Growth"];
+                let phraseIndex = 0, charIndex = 0, isDeleting = false;
+                function animateTyping() {
+                    const target = document.getElementById('typewriter-text');
+                    if (!target) return;
+                    const currentPhrase = phrases[phraseIndex];
+                    if (isDeleting) { target.textContent = currentPhrase.substring(0, charIndex - 1); charIndex--; }
+                    else { target.textContent = currentPhrase.substring(0, charIndex + 1); charIndex++; }
+                    let typingSpeed = isDeleting ? 75 : 150;
+                    if (!isDeleting && charIndex === currentPhrase.length) { isDeleting = true; typingSpeed = 2000; }
+                    else if (isDeleting && charIndex === 0) { isDeleting = false; phraseIndex = (phraseIndex + 1) % phrases.length; typingSpeed = 500; }
+                    setTimeout(animateTyping, typingSpeed);
+                }
+                animateTyping();
+            })(typewriterText);
+        });
+
+        window.toggleRoadmap = function (element) {
+            element.classList.toggle('active');
+            const desc = element.querySelector('.step-desc');
+            if (element.classList.contains('active')) {
+                desc.classList.remove('hidden');
+                gsap.fromTo(desc, { height: 0, opacity: 0 }, { height: "auto", opacity: 1, duration: 0.3 });
+            } else {
+                gsap.to(desc, { height: 0, opacity: 0, duration: 0.3, onComplete: () => desc.classList.add('hidden') });
+            }
+        };
+
+        window.toggleFaq = function (element) {
+            element.classList.toggle('active');
+            const ans = element.querySelector('.faq-answer');
+            if (element.classList.contains('active')) {
+                ans.classList.remove('hidden');
+                gsap.fromTo(ans, { height: 0, opacity: 0 }, { height: "auto", opacity: 1, duration: 0.3 });
+            } else {
+                gsap.to(ans, { height: 0, opacity: 0, duration: 0.3, onComplete: () => ans.classList.add('hidden') });
+            }
+        };
+
+        window.scrollToAnkita = () => document.getElementById('ankita').scrollIntoView({ behavior: 'smooth' });
+        window.scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+        window.showLoginModal = () => document.getElementById('login-modal').classList.remove('hidden');
+        window.closeLoginModal = () => document.getElementById('login-modal').classList.add('hidden');
+
+        window.showIndustryDetails = function (industryKey) {
+            const data = industryData[industryKey];
+            const title = industryKey.charAt(0).toUpperCase() + industryKey.slice(1) + " Automations";
+            const titleEl = document.getElementById('modal-title');
+            const container = document.getElementById('modal-content');
+            if (titleEl && container) {
+                titleEl.innerText = title;
+                const items = [...data]; while (items.length < 6) { items.push({ title: "Advanced Module", desc: "Enterprise integration.", price: "$500" }); }
+                container.innerHTML = items.map(d => `
+                    <div class='p-4 border border-white/10 rounded bg-white/5 cursor-pointer hover:bg-white/10 transition-all group' onclick="toggleItemDetails(this)">
+                        <div class="flex justify-between items-center"><div><h4 class='font-bold text-white'>${d.title}</h4><p class='text-muted text-xs'>${d.desc}</p></div><i class="fas fa-chevron-down text-muted group-hover:text-white transition-transform"></i></div>
+                        <div class="item-details hidden mt-4 pt-4 border-t border-white/10"><p class="text-brand font-bold mb-2">Price: ${d.price || "$500"}</p><a href="tel:7249634419" class="block w-full bg-white text-black text-center font-bold py-2 rounded hover:bg-gray-200 mb-2 text-xs">Call Now</a><a href="https://wa.me/917249634419" target="_blank" class="block w-full bg-[#25D366] text-white text-center font-bold py-2 rounded hover:bg-[#20BD5C] text-xs">WhatsApp</a></div>
+                    </div>`).join('');
+                document.getElementById('industry-modal').classList.remove('hidden');
+            }
+        };
+        window.toggleItemDetails = function (el) {
+            const details = el.querySelector('.item-details');
+            const icon = el.querySelector('.fa-chevron-down');
+            if (details.classList.contains('hidden')) {
+                details.classList.remove('hidden');
+                gsap.fromTo(details, { height: 0, opacity: 0 }, { height: "auto", opacity: 1, duration: 0.3 });
+                if (icon) gsap.to(icon, { rotation: 180, duration: 0.3 });
+            } else {
+                gsap.to(details, { height: 0, opacity: 0, duration: 0.3, onComplete: () => details.classList.add('hidden') });
+                if (icon) gsap.to(icon, { rotation: 0, duration: 0.3 });
+            }
+        };
+        window.closeIndustryModal = () => document.getElementById('industry-modal').classList.add('hidden');
+
+        window.showDeployModal = function (systemName) {
+            if (window.recordDeployInterest) window.recordDeployInterest(systemName);
+            const titleEl = document.getElementById('deploy-title');
+            if (titleEl) titleEl.innerText = "Deploy " + systemName;
+            document.getElementById('deploy-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+        };
+        window.closeDeployModal = function () { document.getElementById('deploy-modal').classList.add('hidden'); document.body.style.overflow = 'auto'; };
+
+        window.showToast = (message) => {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+            const toast = document.createElement('div');
+            toast.className = 'toast show'; toast.innerText = message;
+            container.appendChild(toast);
+            setTimeout(() => { toast.classList.remove('show'); setTimeout(() => toast.remove(), 300); }, 3000);
+        };
+
+        const industryData = {
+            'legal': [{ title: "Contract Review Agent", desc: "AI reviews NDAs in seconds.", price: "$750" }, { title: "Case Research Bot", desc: "Finds legal precedents instantly.", price: "$500" }, { title: "Client Intake", desc: "Automated qualification forms.", price: "$400" }, { title: "Doc Generation", desc: "Auto-fill legal templates.", price: "$600" }, { title: "Compliance Tracker", desc: "Regulatory updates alert.", price: "$550" }, { title: "Billing Automation", desc: "Time tracking to invoice.", price: "$450" }],
+            'finance': [{ title: "Invoice Proc", desc: "Extracts PDF data.", price: "$600" }, { title: "Expense Audit", desc: "Flags anomalies.", price: "$500" }, { title: "Fraud Detect", desc: "Real-time monitor.", price: "$1200" }, { title: "Payroll", desc: "Salary calc.", price: "$800" }, { title: "Tax Prep", desc: "Organizes docs.", price: "$700" }, { title: "Invest Report", desc: "Daily summaries.", price: "$550" }],
+            'education': [{ title: "Student Bot", desc: "Admissions FAQ.", price: "$450" }, { title: "Grading", desc: "Pre-grades tests.", price: "$500" }, { title: "Attendance", desc: "Parent alerts.", price: "$350" }, { title: "Scheduler", desc: "Optimizes classes.", price: "$600" }, { title: "Alumni", desc: "Donation campaigns.", price: "$550" }, { title: "Library", desc: "Book tracking.", price: "$300" }],
+            'travel': [{ title: "Itinerary", desc: "Custom plans.", price: "$650" }, { title: "Booking", desc: "Auto-books.", price: "$800" }, { title: "Visa Help", desc: "Requirements guide.", price: "$400" }, { title: "Price Alert", desc: "Tracks drops.", price: "$300" }, { title: "Local Guide", desc: "Spot recommendations.", price: "$350" }, { title: "Reviews", desc: "Feedback auto.", price: "$250" }],
+            'logistics': [{ title: "Route Opt", desc: "Fastest paths.", price: "$900" }, { title: "Inventory", desc: "Predicts stock.", price: "$850" }, { title: "Dispatch", desc: "Driver assign.", price: "$800" }, { title: "Fleet Maint", desc: "Service alerts.", price: "$500" }, { title: "POD", desc: "Delivery proof.", price: "$600" }, { title: "Supplier", desc: "Auto-ordering.", price: "$550" }],
+            'marketing': [{ title: "Content Repurp", desc: "Video to Blog.", price: "$500" }, { title: "Lead Score", desc: "Qualifies intent.", price: "$600" }, { title: "Social Listen", desc: "Brand tracking.", price: "$450" }, { title: "Ad Adjust", desc: "Optimizes spend.", price: "$800" }, { title: "Email Seq", desc: "Drip campaigns.", price: "$400" }, { title: "Influencer", desc: "Profile scrape.", price: "$550" }],
+            'fitness': [{ title: "Workout Gen", desc: "Custom plans.", price: "$400" }, { title: "Nutrition", desc: "Calorie count.", price: "$500" }, { title: "Class Book", desc: "Waitlist mgmt.", price: "$350" }, { title: "Progress", desc: "Muscle charts.", price: "$450" }, { title: "Wearable", desc: "Sync data.", price: "$600" }, { title: "Retention", desc: "Re-engage.", price: "$400" }],
+            'saas': [{ title: "Onboarding", desc: "Guides users.", price: "$700" }, { title: "Churn Predict", desc: "Identifies risk.", price: "$900" }, { title: "Support", desc: "Auto-tickets.", price: "$550" }, { title: "Features", desc: "User feedback.", price: "$450" }, { title: "Upsell", desc: "Growth accounts.", price: "$650" }, { title: "Monitor", desc: "Downtime alerts.", price: "$500" }]
+        };
+
+        let ACTIVE_MODEL = 'models/gemini-1.5-flash';
+        let conversationHistory = [{ role: "user", parts: [{ text: "You are Ankita, automation expert. Guide user to book." }] }, { role: "model", parts: [{ text: "Online." }] }];
+
+        window.sendMessage = async function () {
+            const userInput = document.getElementById('user-input');
+            const msg = userInput.value.trim();
+            if (!msg) return;
+            appendMessage('user', msg); userInput.value = ''; showTyping(true);
+            conversationHistory.push({ role: "user", parts: [{ text: msg }] });
+
+            const fallback = getFallback(msg);
+            try {
+                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/${ACTIVE_MODEL}:generateContent?key=${API_KEY}`, {
+                    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: conversationHistory })
+                });
+                const data = await res.json();
+                if (data.candidates) showReply(data.candidates[0].content.parts[0].text);
+                else throw new Error("API Fail");
+            } catch (e) {
+                setTimeout(() => showReply(fallback), 1000);
+            }
+        };
+
+        function showReply(text) {
+            showTyping(false);
+            let final = text;
+            if (text.includes("[SHOW_BOOKING]") || text.toLowerCase().includes("book")) {
+                final = text.replace("[SHOW_BOOKING]", "");
+                if (window.recordBookingInterest) window.recordBookingInterest();
+                setTimeout(() => appendBooking(), 600);
+            }
+            appendMessage('ai', final);
+            conversationHistory.push({ role: "model", parts: [{ text: final }] });
+        }
+
+        function getFallback(msg) {
+            const m = msg.toLowerCase();
+            if (m.includes("price")) return "Our tools range from $250-$1000. Shall we book a call? [SHOW_BOOKING]";
+            return "That sounds interesting. Let's discuss further on a call. [SHOW_BOOKING]";
+        }
+
+        function appendMessage(sender, text) {
+            const chat = document.getElementById('chat-history');
+            chat.innerHTML += `<div class="flex gap-4 ${sender === 'user' ? 'justify-end' : ''}"><div class="${sender === 'user' ? 'chat-bubble-user' : 'chat-bubble-ai'} p-4 text-sm max-w-[85%]">${text}</div></div>`;
+            chat.scrollTop = chat.scrollHeight;
+        }
+        function appendBooking() {
+            const chat = document.getElementById('chat-history');
+            chat.innerHTML += `<div class="p-4 rounded-xl bg-brand/20 border border-brand/30"><div class="font-bold text-sm mb-2">Secure Slot</div><a href="${CALENDAR_LINK}" target="_blank" class="block w-full text-center bg-brand text-white font-bold py-2 rounded text-xs">Book Now</a></div>`;
+            chat.scrollTop = chat.scrollHeight;
+        }
+        function showTyping(show) { const ind = document.getElementById('typing-indicator'); if (ind) ind.classList.toggle('hidden', !show); }
+        window.handleKeyPress = function (e) { if (e.key === 'Enter') sendMessage(); };
+
+        ; (function () {
+            const c = document.getElementById('neural-canvas');
+            if (!c) return;
+            const x = c.getContext('2d');
+            let w = c.width = window.innerWidth, h = c.height = window.innerHeight;
+            let p = Array.from({ length: 40 }, () => ({ x: Math.random() * w, y: Math.random() * h, vx: (Math.random() - .5) * .5, vy: (Math.random() - .5) * .5 }));
+            function d() {
+                x.clearRect(0, 0, w, h); x.fillStyle = 'rgba(255,255,255,0.1)';
+                p.forEach(a => {
+                    a.x += a.vx; a.y += a.vy; if (a.x < 0 || a.x > w) a.vx *= -1; if (a.y < 0 || a.y > h) a.vy *= -1;
+                    x.beginPath(); x.arc(a.x, a.y, 1, 0, 7); x.fill();
+                    p.forEach(b => { if (Math.hypot(a.x - b.x, a.y - b.y) < 100) { x.beginPath(); x.strokeStyle = 'rgba(255,255,255,0.05)'; x.moveTo(a.x, a.y); x.lineTo(b.x, b.y); x.stroke(); } });
+                }); requestAnimationFrame(d);
+            }
+            window.addEventListener('resize', () => { w = c.width = window.innerWidth; h = c.height = window.innerHeight; });
+            d();
+        })();
+    </script>
+</body>
+
+</html>
