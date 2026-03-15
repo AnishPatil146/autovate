@@ -922,25 +922,18 @@
         window.recordDeployInterest = async (productName) => { if (!db || !auth.currentUser) return; try { await addDoc(collection(db, "leads"), { userId: auth.currentUser.uid, type: "DEPLOY_INTEREST", product: productName, timestamp: serverTimestamp() }); } catch (e) { } };
 
         window.loginWithGoogle = async function () {
-            if (!auth) {
-                alert("Firebase Auth is not connected. Check your API keys.");
-                return;
-            }
             const provider = new GoogleAuthProvider();
             try {
-                // Popup खोलने की कोशिश
-                const result = await signInWithPopup(auth, provider);
+                await signInWithPopup(auth, provider);
                 window.closeLoginModal();
-
-                // Login सफल होने पर Dashboard पर भेजें
-                window.location.href = "dashboard.html";
+                window.location.href = "dashboard.html"; // Send to real dashboard
             }
             catch (error) {
-                // अगर Popup क्रैश होता है, तो असली वजह स्क्रीन पर दिखेगी
-                console.error("Firebase Login Error:", error);
-                alert("Login Failed!\nReason: " + error.message + "\n\nMake sure you are using Live Server (http://127.0.0.1) and Google Sign-in is enabled in Firebase Console.");
+                console.error("Login failed:", error);
+                alert("Login failed! Make sure you are using a Local Server (127.0.0.1) and not a file:/// URL.");
             }
         }
+
         function simulateLogin() {
             window.closeLoginModal();
             window.showToast("Demo Login Active. Redirecting to Dashboard...");
